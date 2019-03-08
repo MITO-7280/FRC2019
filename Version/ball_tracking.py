@@ -103,8 +103,8 @@ while True:
                 ballPos = 2
             else:
                 ballPos = 3
-        else:
-            ballPos = 0
+    else:
+        ballPos = 0
     print(ballPos)
 
 
