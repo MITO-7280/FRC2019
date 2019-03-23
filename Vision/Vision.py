@@ -4,7 +4,6 @@ from networktables import NetworkTables
 import cv2
 import cscore as cs
 from collections import deque
-import cscore
 import numpy as np
 import json
 import math
@@ -14,9 +13,13 @@ import logging
 team = 7280
 
 # networktable initialization
+logging.basicConfig(level=logging.DEBUG)
+
 NetworkTables.initialize(server='roborio-7280-frc.local')
 ballNetwork = NetworkTables.getTable("ball")
 tapeNetwork = NetworkTables.getTable("tape")
+needNetwork = NetworkTables.getTable("isNeeded")
+
 
 
 pts = deque(maxlen=64)
@@ -46,8 +49,8 @@ hsvBallUpper = (15, 255, 255)
 hsvTapeLower = (82, 75, 176)
 hsvTapeUpper = (96, 255, 255)
 
-hsvGroundLower = (7, 0, 160)
-hsvGroundUpper = (110, 35, 255)
+hsvGroundLower = (0, 0, 192)
+hsvGroundUpper = (255, 70, 255)
 # set the configFile
 configFile = "/boot/frc.json"
 cameraConfigs = []
@@ -77,10 +80,10 @@ ballSink.setSource(ballCamera)
 groundSink = cs.CvSink("groundSink")
 groundSink.setSource(groundCamera)
 
-cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
-cvBallServer = cs.MjpegServer("vision", 8082)
-cvBallServer.setSource(cvBallSource)
-print("OpenCV output ball server listening at http://0.0.0.0:8082")
+# cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
+# cvBallServer = cs.MjpegServer("vision", 8082)
+# cvBallServer.setSource(cvBallSource)
+# print("OpenCV output ball server listening at http://0.0.0.0:8082")
 
 cvGroundSource = cs.CvSource("cvgroundsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
 cvGroundServer = cs.MjpegServer("vision", 8182)
@@ -121,29 +124,31 @@ while True:
         # it to compute the minimum enclosing circle and
         # centroid
         c = max(ballContours, key=cv2.contourArea)
-        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        ((_, _), radius) = cv2.minEnclosingCircle(c)
         M = cv2.moments(c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
         # only proceed if the radius meets a minimum size
         if radius > 10:
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
-            cv2.circle(ballFrame, (int(x), int(y)), int(radius),
-                       (0, 255, 255), 2)
-            cv2.circle(ballFrame, center, 5, (0, 0, 255), -1)
-            if center[0] < (width / 2 - width / 16):
-                ballPos = 1
-            elif center[0] > (width / 2 + width / 16):
-                ballPos = 2
-            else:
+            # cv2.circle(ballFrame, (int(x), int(y)), int(radius),
+            #            (0, 255, 255), 2)
+            # cv2.circle(ballFrame, center, 5, (0, 0, 255), -1)
+            if center[1] > (height * 0.8):
                 ballPos = 3
+            else:
+                if center[0] < (width / 2 - width / 10):
+                    ballPos = 1
+                elif center[0] > (width / 2 + width / 10):
+                    ballPos = 2
+                else:
+                    ballPos = 3
     else:
         ballPos = 0
     # print("ballPos=", ballPos)
     ballNetwork.putNumber("Y", ballPos)
-
     # update the points queuec
-    pts.appendleft(center)
+    # pts.appendleft(center)
     # loop over the set of tracked points
     # for i in range(1, len(pts)):
     #         # if either of the tracked points are None, ignore them
@@ -151,13 +156,13 @@ while True:
     #             continue
     #         thickness = 2
     #         cv2.line(ballFrame, pts[i - 1], pts[i], (0, 0, 255), thickness)
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    # font = cv2.FONT_HERSHEY_SIMPLEX
 
 
     # Tape Part
 
     _, tapeFrame = ballSink.grabFrame(tapenp)
-    # tapeBlurred = cv2.GaussianBlur(tapeFrame, (7, 7), 0)
+    # tapeBlurred = cv2.blur(tapeFrame, (10, 10))
     tapeHsv = cv2.cvtColor(tapeFrame, cv2.COLOR_BGR2HSV)
     tapeMask = cv2.inRange(tapeHsv, hsvTapeLower, hsvTapeUpper)
     tapeMask = cv2.erode(tapeMask, None, iterations=2)
@@ -173,11 +178,11 @@ while True:
         rect0 = cv2.minAreaRect(cntsSorted[0])
         box0 = cv2.boxPoints(rect0)
         box0 = np.int0(box0)
-        cv2.drawContours(ballFrame, [box0], 0, (0, 0, 255), 2)
+        # cv2.drawContours(ballFrame, [box0], 0, (0, 0, 255), 2)
         rect1 = cv2.minAreaRect(cntsSorted[1])
         box1 = cv2.boxPoints(rect1)
         box1 = np.int0(box1)
-        cv2.drawContours(ballFrame, [box1], 0, (0, 0, 255), 2)
+        # cv2.drawContours(ballFrame, [box1], 0, (0, 0, 255), 2)
 
         tape0Center = int(rect0[0][0]), int(rect0[0][1])
         tape1Center = int(rect1[0][0]), int(rect1[0][1])
@@ -191,45 +196,59 @@ while True:
             tapePos = 2
         else:
             tapePos = 3
-        cv2.circle(ballFrame, (int(tapeMiddleCenter0), int(tapeMiddleCenter1)), 5, (0, 0, 255), -1)
+        # cv2.circle(ballFrame, (int(tapeMiddleCenter0), int(tapeMiddleCenter1)), 5, (0, 0, 255), -1)
     else:
         tapePos = 0
     tapeNetwork.putNumber("X", tapePos)
-    cvBallSource.putFrame(ballFrame)
+    # cvBallSource.putFrame(ballFrame)
     # print(tapePos)
 
     # Ground Part
+    isNeeded = int(needNetwork.getNumber("X", 1))
+    if isNeeded == 1:
+        _, groundFrame = groundSink.grabFrame(tapenp)
+        groundBlurred = cv2.blur(groundFrame, (4, 4))
+        groundHsv = cv2.cvtColor(groundFrame, cv2.COLOR_BGR2HSV)
+        groundMask = cv2.inRange(groundHsv, hsvGroundLower, hsvGroundUpper)
+        groundMask = cv2.erode(groundMask, None, iterations=2)
+        groundMask = cv2.dilate(groundMask, None, iterations=2)
+        _, groundContours, _ = cv2.findContours(groundMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
+        groundImage = groundFrame.copy()
+        global groundPos
+        if len(groundContours) > 0:
+            groundc = max(groundContours, key=cv2.contourArea)
+            groundImage = cv2.drawContours(groundImage, [groundc], 0, (0, 255, 0), 2)
+            if cv2.contourArea(groundc) > 200:
+                groundM = cv2.moments(groundc)
+                groundCenter = (int(groundM["m10"] / groundM["m00"]), int(groundM["m01"] / groundM["m00"]))
+                cv2.circle(groundImage, groundCenter, 5, (0, 0, 255), -1)
 
-    _, groundFrame = groundSink.grabFrame(tapenp)
-    # groundBlurred = cv2.GaussianBlur(groundFrame, (7, 7), 0)
-    groundHsv = cv2.cvtColor(groundFrame, cv2.COLOR_BGR2HSV)
-    groundMask = cv2.inRange(groundHsv, hsvGroundLower, hsvGroundUpper)
-    groundMask = cv2.erode(groundMask, None, iterations=2)
-    groundMask = cv2.dilate(groundMask, None, iterations=2)
-    _, groundContours, _ = cv2.findContours(groundMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
-    groundImage = groundFrame.copy()
-    if len(groundContours) > 0:
-        groundc = max(groundContours, key=cv2.contourArea)
-        groundRect = cv2.minAreaRect(groundc)
-        groundBox = cv2.boxPoints(groundRect)
-        groundBox = np.int0(groundBox)
-        cv2.drawContours(groundImage, [groundBox], 0, (0, 0, 255), 2)
-        groundCenter = int(groundRect[0][0]), int(groundRect[0][1])
-        cv2.circle(groundImage, groundCenter, 5, (0, 0, 255), -1)
 
-        if groundCenter[0] < (width / 2 - width / 8):
-            groundPos = 4
-        elif groundCenter[0] > (width / 2 + width / 8):
-            groundPos = 5
-        elif groundRect[1][0] < groundRect[1][1]:
-            groundPos = 1
-        elif groundRect[1][0] > groundRect[1][1]:
-            groundPos = 2
+                rows, cols = groundImage.shape[:2]
+                [vx, vy, x, y] = cv2.fitLine(groundc, cv2.DIST_L2, 0, 0.01, 0.01)
+                k = vy / vx
+                lefty = int((-x * k) + y)
+                righty = int(((cols - x) * k) + y)
+                groundImage = cv2.line(groundImage, (cols - 1, righty), (0, lefty), (0, 255, 0), 2)
+
+                if groundCenter[0] < (width / 2 - width / 8):
+                    groundPos = 4
+                elif groundCenter[0] > (width / 2 + width / 8):
+                    groundPos = 5
+                elif (vx / vy) < (-1.732):
+                    groundPos = 1
+                elif (vx / vy) > 1.732:
+                    groundPos = 2
+                else:
+                    groundPos = 3
+            else:
+                groundPos = 6
         else:
-            groundPos = 3
-        print(groundPos)
-    cvGroundSource.putFrame(groundImage)
-    tapeNetwork.putNumber("Y", groundPos)
-    FPS = 1 / (time.time() - tempTime)  # type: float
-    # print("FPS=", FPS)
+            groundPos = 6
+        # print(groundPos)
+        tapeNetwork.putNumber("Y", groundPos)
 
+        cvGroundSource.putFrame(groundImage)
+
+    FPS = 1 / (time.time() - tempTime)  # type: float
+    print("FPS=", FPS)
