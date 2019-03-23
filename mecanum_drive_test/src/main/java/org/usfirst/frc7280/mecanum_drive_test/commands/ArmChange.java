@@ -7,16 +7,19 @@
 
 package org.usfirst.frc7280.mecanum_drive_test.commands;
 
+import org.usfirst.frc7280.mecanum_drive_test.Constants;
 import org.usfirst.frc7280.mecanum_drive_test.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class IntakerLiftDown extends Command {
-  public IntakerLiftDown() {
+public class ArmChange extends Command {
+
+  public boolean change = false;
+
+  public ArmChange() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
-
-    requires(Robot.intaker);
+    requires(Robot.arm);
   }
 
   // Called just before this Command runs the first time
@@ -27,7 +30,14 @@ public class IntakerLiftDown extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Robot.intaker.intakerLiftDown();
+    if (Robot.oi.functionStick.getRawButtonPressed(8)){
+      change = !change;
+    }
+    if (!change) {
+      Robot.arm.lift();
+    } else {
+    Robot.arm.down();
+    }
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -39,13 +49,11 @@ public class IntakerLiftDown extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    Robot.intaker.intakerLiftDown();
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    end();
   }
 }

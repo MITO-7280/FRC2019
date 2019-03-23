@@ -11,11 +11,11 @@ import org.usfirst.frc7280.mecanum_drive_test.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class IntakerLiftUp extends Command {
-  public IntakerLiftUp() {
+public class GetTableData extends Command {
+  public GetTableData() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
-    requires(Robot.intaker);
+    requires(Robot.netWorkTable);
   }
 
   // Called just before this Command runs the first time
@@ -26,7 +26,7 @@ public class IntakerLiftUp extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Robot.intaker.intakerLiftUp();
+    Robot.netWorkTable.getTableData();
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -38,13 +38,12 @@ public class IntakerLiftUp extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    Robot.intaker.intakerLiftUp();
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    end();
+    Robot.netWorkTable.getTableData();
   }
 }

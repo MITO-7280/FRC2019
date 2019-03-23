@@ -7,67 +7,41 @@
 
 package org.usfirst.frc7280.mecanum_drive_test.commands;
 
-import org.usfirst.frc7280.mecanum_drive_test.Constants;
 import org.usfirst.frc7280.mecanum_drive_test.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class Lift extends Command {
-
-  int targetPosition;
-  boolean finished = false;
-
-  public Lift(int _position) {
+public class MoveX extends Command {
+  int targetDistance;
+  public MoveX(int _distance) {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
-    requires(Robot.elevator);
     requires(Robot.base);
-    requires(Robot.arm);
-    requires(Robot.intaker);
-
-    // determine target position
-    targetPosition = _position;
-
+    targetDistance = _distance;
   }
 
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
+    Robot.base.zeroSensorPostition();
+    Robot.base.configPositionPID();
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    finished = false;
-
-    // if (targetPosition == Constants.kFirstLevel) {
-    //   Robot.arm.down();
-    // }
-
-    if (Robot.judge.manualModeOn) {
-      Robot.elevator.liftToPosition(targetPosition);
-    } else {
-      if (Robot.base.visionDriveOK && Robot.base.visionTurnOK) {
-        Robot.elevator.liftToPosition(targetPosition);
-        // Robot.intaker.cylinderUp();
-        finished = true;
-      } else {
-        Robot.base.speed(Robot.base.visionDrive()[0], Robot.base.visionDrive()[1], Robot.base.visionTurn());
-        //Robot.base.speedDrive();
-      }
-    }
+    Robot.base.moveX(targetDistance);
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    return finished;
+    return Math.abs(Robot.base.getCurrentDistance()-targetDistance) < 500;
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    Robot.elevator.liftToPosition(targetPosition);
   }
 
   // Called when another command which requires one or more of the same
@@ -75,5 +49,6 @@ public class Lift extends Command {
   @Override
   protected void interrupted() {
     end();
+    Robot.base.configVelocityPID();
   }
 }
