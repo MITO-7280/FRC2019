@@ -116,8 +116,9 @@ public class OI {
         // armChange.toggleWhenPressed(new ArmDown());
 
         // manual solenoid
-        solenoidActivate = new JoystickButton(functionStick, 9);
-        solenoidActivate.toggleWhenPressed(new SolenoidActivate());
+        // solenoidActivate = new JoystickButton(functionStick, 9);
+        // solenoidActivate.toggleWhenPressed(new SolenoidActivate());
+        // move to default command 
 
         elevatorDown = new JoystickButton(functionStick, 10);
         elevatorDown.whenPressed(new ElevatorDown());

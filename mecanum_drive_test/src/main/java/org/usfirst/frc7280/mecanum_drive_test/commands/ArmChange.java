@@ -30,6 +30,7 @@ public class ArmChange extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
+    // false is lift , ture is down
     if (Robot.oi.functionStick.getRawButtonPressed(8)){
       change = !change;
     }
@@ -55,5 +56,13 @@ public class ArmChange extends Command {
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
+    if (Robot.oi.functionStick.getRawButtonPressed(8)){
+      change = !change;
+    }
+    if (!change) {
+      Robot.arm.lift();
+    } else {
+    Robot.arm.down();
+    }
   }
 }

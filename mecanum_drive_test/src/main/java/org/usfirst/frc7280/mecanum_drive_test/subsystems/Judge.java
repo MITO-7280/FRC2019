@@ -22,9 +22,12 @@ public class Judge extends Subsystem {
 
   public boolean manualModeOn = false;
   public boolean hasBall = false;
-  public boolean atButtom = true;
+  public boolean atButtom = false;
+  public boolean atDown = false;
   public int visionDistence = 1000;
+
   private DigitalInput elevatorSensor = new DigitalInput(1);
+  private DigitalInput armSensor = new DigitalInput(1);
 
   @Override
   public void initDefaultCommand() {
@@ -44,5 +47,6 @@ public class Judge extends Subsystem {
 
     public void detecting(){
       atButtom = elevatorSensor.get();
+      atDown = armSensor.get();
     }
 }

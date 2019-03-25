@@ -17,6 +17,9 @@ public class Lift extends Command {
   int targetPosition;
   boolean finished = false;
 
+  SolenoidActivate x = new SolenoidActivate();
+  ArmChange y = new ArmChange();
+
   public Lift(int _position) {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
@@ -42,18 +45,33 @@ public class Lift extends Command {
 
     // if (targetPosition == Constants.kFirstLevel) {
     //   Robot.arm.down();
+    //   y.change = true;
     // }
 
     if (Robot.judge.manualModeOn) {
+
       Robot.elevator.liftToPosition(targetPosition);
+
     } else {
+
       if (Robot.base.visionDriveOK && Robot.base.visionTurnOK) {
+
+        if (targetPosition == Constants.kFirstLevel || targetPosition == Constants.kSecondLevel
+            || targetPosition == Constants.kFourthLevel) {
+
+          Robot.intaker.cylinderUp();
+          x.change = true;
+        }
+
         Robot.elevator.liftToPosition(targetPosition);
-        // Robot.intaker.cylinderUp();
+
         finished = true;
+        
       } else {
+
         Robot.base.speed(Robot.base.visionDrive()[0], Robot.base.visionDrive()[1], Robot.base.visionTurn());
-        //Robot.base.speedDrive();
+        Robot.base.speedDrive();
+
       }
     }
   }

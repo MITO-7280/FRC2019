@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.command.Command;
 public class LiftZero extends Command {
 
   int targetPosition;
+  ArmChange x = new ArmChange();
+
 
   public LiftZero(int _position) {
     requires(Robot.elevator);
@@ -31,9 +33,17 @@ public class LiftZero extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Robot.elevator.liftToPosition(targetPosition);
+
+    x.change = false;
     Robot.arm.lift();
-    // modify needed after installing 霍尔开关
+
+    if (Robot.judge.atButtom) {
+      Robot.elevator.stop();
+      Robot.elevator.elevatorMaster.setSelectedSensorPosition(0);
+    } else {
+    Robot.elevator.liftToPosition(targetPosition);    
+    }
+    // modify needed after installing switch
   }
 
   // Make this return true when this Command no longer needs to run execute()
