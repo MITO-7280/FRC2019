@@ -14,12 +14,11 @@ import edu.wpi.first.wpilibj.command.Command;
 public class LiftZero extends Command {
 
   int targetPosition;
-  ArmChange x = new ArmChange();
 
 
   public LiftZero(int _position) {
     requires(Robot.elevator);
-    requires(Robot.arm);
+    // requires(Robot.arm);
 
     // determine target position
     targetPosition = _position;
@@ -33,17 +32,9 @@ public class LiftZero extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-
-    x.change = false;
-    Robot.arm.lift();
-
-    if (Robot.judge.atButtom) {
-      Robot.elevator.stop();
-      Robot.elevator.elevatorMaster.setSelectedSensorPosition(0);
-    } else {
-    Robot.elevator.liftToPosition(targetPosition);    
-    }
-    // modify needed after installing switch
+    Robot.elevator.liftToPosition(targetPosition);
+    // Robot.arm.lift();
+    // modify needed after installing 
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -56,6 +47,7 @@ public class LiftZero extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
+    // Robot.arm.lift();
   }
 
   // Called when another command which requires one or more of the same

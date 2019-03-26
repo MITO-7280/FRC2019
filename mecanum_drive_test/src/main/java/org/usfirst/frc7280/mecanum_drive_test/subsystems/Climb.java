@@ -51,8 +51,8 @@ public class Climb extends Subsystem {
     climbMotionMotor.setInverted(true);
     //frontSlaveMotor.follow(frontMasterMotor);
 
-    robotMap.setMotorPID(backClimbMotor, 0, 0.07, 0, 0);
-    robotMap.setMotorPID(frontMasterMotor, 0, 0.16, 0, 0);
+    robotMap.setMotorPID(backClimbMotor, 0, 0.1, 0, 0);
+    robotMap.setMotorPID(frontMasterMotor, 0, 0.14, 0, 0);
     robotMap.setMotorPID(frontSlaveMotor, 0, 0.14, 0, 0);
 
     frontMasterMotor.setNeutralMode(NeutralMode.Brake);
@@ -72,9 +72,13 @@ public class Climb extends Subsystem {
   public void climbStage(int _level){
     int step = _level / 4;
 
-    robotMap.TalonSRXInit(backClimbMotor, Constants.kClimbPeakOutput);
-    robotMap.TalonSRXInit(frontMasterMotor, Constants.kClimbPeakOutput);
-    robotMap.TalonSRXInit(frontSlaveMotor, Constants.kClimbPeakOutput);
+    // robotMap.TalonSRXInit(backClimbMotor, Constants.kClimbPeakOutput);
+    // robotMap.TalonSRXInit(frontMasterMotor, Constants.kClimbPeakOutput);
+    // robotMap.TalonSRXInit(frontSlaveMotor, Constants.kClimbPeakOutput);
+
+    // backClimbMotor.configClosedLoopPeakOutput(0, Constants.kClimbPeakOutput);
+    // frontMasterMotor.configClosedLoopPeakOutput(0, Constants.kClimbPeakOutput);
+    // backClimbMotor.configClosedLoopPeakOutput(0, Constants.kClimbPeakOutput);
 
     
     if (Math.abs(Math.abs(frontMasterMotor.getSelectedSensorPosition()) - level)  <= 1000 
@@ -91,6 +95,8 @@ public class Climb extends Subsystem {
       frontMasterMotor.set(ControlMode.Position, level);
       frontSlaveMotor.set(ControlMode.Position, level);
       backClimbMotor.set(ControlMode.Position, level);
+      
+      System.out.println(frontMasterMotor.getErrorDerivative());
 
       SmartDashboard.putNumber("clim num", level);
       SmartDashboard.putNumber("frontMaster pos", frontMasterMotor.getSelectedSensorPosition());
@@ -102,18 +108,30 @@ public class Climb extends Subsystem {
     backLevel = _level;
     SmartDashboard.putNumber("front Level", frontLevel);
     SmartDashboard.putNumber("back Level", backLevel);
+
+    // frontMasterMotor.set(ControlMode.Velocity, 750);
+    // frontSlaveMotor.set(ControlMode.Velocity, 750);
+    // backClimbMotor.set(ControlMode.Velocity, 750);
+
   }
 
   public void retrieveBack(){
-    robotMap.TalonSRXInit(backClimbMotor, Constants.kClimbBackOutput);
+    // robotMap.TalonSRXInit(backClimbMotor, Constants.kClimbBackOutput);
+
+    backClimbMotor.configClosedLoopPeakOutput(0, Constants.kClimbPeakOutput);
 
     backClimbMotor.set(ControlMode.Position, 0);
     Robot.base.drive(-0.2, 0, 0);
   }
 
   public void retrieveFront() {
-    robotMap.TalonSRXInit(frontMasterMotor, Constants.kClimbBackOutput);
-    robotMap.TalonSRXInit(frontSlaveMotor, Constants.kClimbBackOutput);
+    // robotMap.TalonSRXInit(frontMasterMotor, Constants.kClimbBackOutput);
+    // robotMap.TalonSRXInit(frontSlaveMotor, Constants.kClimbBackOutput);
+
+    frontMasterMotor.configClosedLoopPeakOutput(0, Constants.kClimbBackOutput);
+    backClimbMotor.configClosedLoopPeakOutput(0, Constants.kClimbBackOutput);
+    Robot.base.drive(-0.2, 0, 0);
+    
 
     frontMasterMotor.set(ControlMode.Position, 0);
     frontSlaveMotor.set(ControlMode.Position, 0);

@@ -17,14 +17,11 @@ public class Lift extends Command {
   int targetPosition;
   boolean finished = false;
 
-  SolenoidActivate x = new SolenoidActivate();
-  ArmChange y = new ArmChange();
-
   public Lift(int _position) {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
     requires(Robot.elevator);
-    requires(Robot.base);
+    // requires(Robot.base); // moified
     requires(Robot.arm);
     requires(Robot.intaker);
 
@@ -43,35 +40,29 @@ public class Lift extends Command {
   protected void execute() {
     finished = false;
 
-    // if (targetPosition == Constants.kFirstLevel) {
-    //   Robot.arm.down();
-    //   y.change = true;
-    // }
+    if (targetPosition == Constants.kFirstLevel) {
+      Robot.arm.down();
+      Robot.intaker.cylinderUp(); // added
+
+    }
 
     if (Robot.judge.manualModeOn) {
-
       Robot.elevator.liftToPosition(targetPosition);
-
+      // Robot.arm.lift();
+      // Robot.base.drive(Robot.oi.motionStick.getY(), Robot.oi.motionStick.getX(), Robot.oi.motionStick.getZ());
     } else {
-
       if (Robot.base.visionDriveOK && Robot.base.visionTurnOK) {
-
-        if (targetPosition == Constants.kFirstLevel || targetPosition == Constants.kSecondLevel
-            || targetPosition == Constants.kFourthLevel) {
-
-          Robot.intaker.cylinderUp();
-          x.change = true;
-        }
-
         Robot.elevator.liftToPosition(targetPosition);
 
+        // modified 
+        if (targetPosition == Constants.kThirdLevel ||
+        targetPosition == Constants.kFifthLevel)
+        Robot.intaker.cylinderDown();
+        Robot.base.drive(0, 0, 0); // added
         finished = true;
-        
       } else {
-
         Robot.base.speed(Robot.base.visionDrive()[0], Robot.base.visionDrive()[1], Robot.base.visionTurn());
         Robot.base.speedDrive();
-
       }
     }
   }

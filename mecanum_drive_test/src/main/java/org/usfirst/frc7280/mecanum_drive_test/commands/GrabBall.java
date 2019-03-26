@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.command.Command;
 public class GrabBall extends Command {
 
   boolean finished;
-  ArmChange x = new ArmChange();
 
 
   public GrabBall() {
@@ -36,12 +35,10 @@ public class GrabBall extends Command {
 
     Robot.intaker.take(-0.3);
     Robot.arm.down();
-    x.change = true;
 
     if (Robot.oi.motionStick.getRawButtonReleased(5)){
       Robot.intaker.take(0);
       Robot.arm.lift();
-      x.change = false;
 
       finished = true;;
     }
