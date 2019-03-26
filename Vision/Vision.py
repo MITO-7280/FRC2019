@@ -192,7 +192,7 @@ while True:
     else:
         tapePos = 0
     tapeNetwork.putNumber("X", tapePos)
-    # cvBallSource.putFrame(ballFrame)
+    cvBallSource.putFrame(ballFrame)
     # print(tapePos)
 
     # Ground Part
