@@ -117,14 +117,14 @@ while True:
         # it to compute the minimum enclosing circle and
         # centroid
         c = max(ballContours, key=cv2.contourArea)
-        ((_, _), radius) = cv2.minEnclosingCircle(c)
+        ((circlex, circley), radius) = cv2.minEnclosingCircle(c)
         M = cv2.moments(c)
         center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
         # only proceed if the radius meets a minimum size
         if radius > 10:
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
-            cv2.circle(ballFrame, (int(x), int(y)), int(radius),
+            cv2.circle(ballFrame, (int(circlex), int(circley)), int(radius),
                        (0, 255, 255), 2)
             cv2.circle(ballFrame, center, 5, (0, 0, 255), -1)
             if center[1] > (height * 0.8):
@@ -192,7 +192,9 @@ while True:
     else:
         tapePos = 0
     tapeNetwork.putNumber("X", tapePos)
+    #
     cvBallSource.putFrame(ballFrame)
+
     # print(tapePos)
 
     # Ground Part
