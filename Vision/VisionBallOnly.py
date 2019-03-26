@@ -58,13 +58,13 @@ groundCamera.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
 # set the mjpegServer
 # Server initial
 
-ballServer = cs.MjpegServer("ballSource", 8081)
+ballServer = cs.MjpegServer("ballSource", 1181)
 ballServer.setSource(ballCamera)
 
 groundServer = cs.MjpegServer("groundSource", 8181)
 groundServer.setSource(groundCamera)
 
-print("ball server listening at http://0.0.0.0:8081")
+print("ball server listening at http://0.0.0.0:1181")
 print("ground server listening at http://0.0.0.0:8181")
 
 ballSink = cs.CvSink("ballSink")
