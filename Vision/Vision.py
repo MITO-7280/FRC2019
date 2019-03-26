@@ -20,19 +20,12 @@ ballNetwork = NetworkTables.getTable("ball")
 tapeNetwork = NetworkTables.getTable("tape")
 needNetwork = NetworkTables.getTable("isNeeded")
 
-
-
 pts = deque(maxlen=64)
 
 # set the camera resolution
 
 width = 320
 height = 240
-
-# set the output resolution
-
-outputWidth = 320
-outputHeight = 240
 
 ballnp = np.zeros(shape=(width, height, 3), dtype=np.uint8)
 tapenp = np.zeros(shape=(width, height, 3), dtype=np.uint8)
@@ -80,10 +73,10 @@ ballSink.setSource(ballCamera)
 groundSink = cs.CvSink("groundSink")
 groundSink.setSource(groundCamera)
 
-# cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
-# cvBallServer = cs.MjpegServer("vision", 8082)
-# cvBallServer.setSource(cvBallSource)
-# print("OpenCV output ball server listening at http://0.0.0.0:8082")
+cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
+cvBallServer = cs.MjpegServer("vision", 8082)
+cvBallServer.setSource(cvBallSource)
+print("OpenCV output ball server listening at http://0.0.0.0:8082")
 
 cvGroundSource = cs.CvSource("cvgroundsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
 cvGroundServer = cs.MjpegServer("vision", 8182)
@@ -131,9 +124,9 @@ while True:
         if radius > 10:
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
-            # cv2.circle(ballFrame, (int(x), int(y)), int(radius),
-            #            (0, 255, 255), 2)
-            # cv2.circle(ballFrame, center, 5, (0, 0, 255), -1)
+            cv2.circle(ballFrame, (int(x), int(y)), int(radius),
+                       (0, 255, 255), 2)
+            cv2.circle(ballFrame, center, 5, (0, 0, 255), -1)
             if center[1] > (height * 0.8):
                 ballPos = 3
             else:
@@ -145,7 +138,7 @@ while True:
                     ballPos = 3
     else:
         ballPos = 0
-    # print("ballPos=", ballPos)
+    print("ballPos=", ballPos)
     ballNetwork.putNumber("Y", ballPos)
     # update the points queuec
     # pts.appendleft(center)
@@ -174,7 +167,6 @@ while True:
 
     if len(tapeContours) > 1:
         cntsSorted = sorted(tapeContours, key=lambda x: cv2.contourArea(x), reverse=True)
-
         rect0 = cv2.minAreaRect(cntsSorted[0])
         box0 = cv2.boxPoints(rect0)
         box0 = np.int0(box0)
@@ -251,4 +243,4 @@ while True:
         cvGroundSource.putFrame(groundImage)
 
     FPS = 1 / (time.time() - tempTime)  # type: float
-    print("FPS=", FPS)
+    print("FPS=", FPS) 
