@@ -73,10 +73,10 @@ ballSink.setSource(ballCamera)
 groundSink = cs.CvSink("groundSink")
 groundSink.setSource(groundCamera)
 
-cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
-cvBallServer = cs.MjpegServer("vision", 8082)
-cvBallServer.setSource(cvBallSource)
-print("OpenCV output ball server listening at http://0.0.0.0:8082")
+# cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
+# cvBallServer = cs.MjpegServer("vision", 8082)
+# cvBallServer.setSource(cvBallSource)
+# print("OpenCV output ball server listening at http://0.0.0.0:8082")
 
 # cvGroundSource = cs.CvSource("cvgroundsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
 # cvGroundServer = cs.MjpegServer("vision", 8182)
@@ -124,9 +124,9 @@ while True:
         if radius > 10:
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
-            cv2.circle(ballFrame, (int(circlex), int(circley)), int(radius),
-                       (0, 255, 255), 2)
-            cv2.circle(ballFrame, center, 5, (0, 0, 255), -1)
+#             cv2.circle(ballFrame, (int(circlex), int(circley)), int(radius),
+#                        (0, 255, 255), 2)
+#             cv2.circle(ballFrame, center, 5, (0, 0, 255), -1)
             if center[1] > (height * 0.8):
                 ballPos = 3
             else:
@@ -141,7 +141,8 @@ while True:
     print("ballPos=", ballPos)
     ballNetwork.putNumber("Y", ballPos)
 
-    cvBallSource.putFrame(ballFrame)
+#     cvBallSource.putFrame(ballFrame)
+
     # update the points queuec
     # pts.appendleft(center)
     # loop over the set of tracked points
