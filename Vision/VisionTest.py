@@ -39,8 +39,8 @@ hsvBallUpper = (15, 255, 255)
 # hsvTapeLower = (0, 0, 245)
 # hsvTapeUpper = (255, 20, 255)
 
-hsvTapeLower = (82, 75, 176)
-hsvTapeUpper = (96, 255, 255)
+hsvTapeLower = (80, 75, 170)
+hsvTapeUpper = (100, 255, 255)
 
 hsvGroundLower = (0, 0, 192)
 hsvGroundUpper = (255, 70, 255)
@@ -58,14 +58,14 @@ groundCamera.setVideoMode(cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
 # set the mjpegServer
 # Server initial
 
-ballServer = cs.MjpegServer("ballSource", 8081)
+ballServer = cs.MjpegServer("ballSource", 1181)
 ballServer.setSource(ballCamera)
 
-groundServer = cs.MjpegServer("groundSource", 8181)
+groundServer = cs.MjpegServer("groundSource", 1183)
 groundServer.setSource(groundCamera)
 
-print("ball server listening at http://0.0.0.0:8081")
-print("ground server listening at http://0.0.0.0:8181")
+print("ball server listening at http://10.72.80.12:1181")
+print("ground server listening at http://10.72.80.12:1183")
 
 ballSink = cs.CvSink("ballSink")
 ballSink.setSource(ballCamera)
@@ -73,10 +73,10 @@ ballSink.setSource(ballCamera)
 groundSink = cs.CvSink("groundSink")
 groundSink.setSource(groundCamera)
 
-# cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
-# cvBallServer = cs.MjpegServer("vision", 8082)
-# cvBallServer.setSource(cvBallSource)
-# print("OpenCV output ball server listening at http://0.0.0.0:8082")
+cvBallSource = cs.CvSource("cvballsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
+cvBallServer = cs.MjpegServer("vision", 1182)
+cvBallServer.setSource(cvBallSource)
+print("OpenCV output ball server listening at http://0.0.0.0:1182")
 
 # cvGroundSource = cs.CvSource("cvgroundsource", cs.VideoMode.PixelFormat.kMJPEG, width, height, 30)
 # cvGroundServer = cs.MjpegServer("vision", 8182)
@@ -171,11 +171,11 @@ while True:
         rect0 = cv2.minAreaRect(cntsSorted[0])
         box0 = cv2.boxPoints(rect0)
         box0 = np.int0(box0)
-        # cv2.drawContours(ballFrame, [box0], 0, (0, 0, 255), 2)
+        cv2.drawContours(ballFrame, [box0], 0, (0, 0, 255), 2)
         rect1 = cv2.minAreaRect(cntsSorted[1])
         box1 = cv2.boxPoints(rect1)
         box1 = np.int0(box1)
-        # cv2.drawContours(ballFrame, [box1], 0, (0, 0, 255), 2)
+        cv2.drawContours(ballFrame, [box1], 0, (0, 0, 255), 2)
 
         tape0Center = int(rect0[0][0]), int(rect0[0][1])
         tape1Center = int(rect1[0][0]), int(rect1[0][1])
@@ -189,14 +189,14 @@ while True:
             tapePos = 2
         else:
             tapePos = 3
-        # cv2.circle(ballFrame, (int(tapeMiddleCenter0), int(tapeMiddleCenter1)), 5, (0, 0, 255), -1)
+        cv2.circle(ballFrame, (int(tapeMiddleCenter0), int(tapeMiddleCenter1)), 5, (0, 0, 255), -1)
     else:
         tapePos = 0
     tapeNetwork.putNumber("X", tapePos)
     #
-    # cvBallSource.putFrame(ballFrame)
+    cvBallSource.putFrame(ballFrame)
 
-    # print(tapePos)
+    print(tapePos)
 
     # Ground Part
     # isNeeded = int(needNetwork.getNumber("X", 1))
