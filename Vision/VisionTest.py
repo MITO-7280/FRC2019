@@ -39,7 +39,7 @@ hsvBallUpper = (15, 255, 255)
 # hsvTapeLower = (0, 0, 245)
 # hsvTapeUpper = (255, 20, 255)
 
-hsvTapeLower = (86, 85, 190)
+hsvTapeLower = (86, 40, 167)
 hsvTapeUpper = (100, 255, 255)
 
 hsvGroundLower = (0, 0, 192)
@@ -156,7 +156,7 @@ while True:
     # Tape Part
 
     _, tapeFrame = ballSink.grabFrame(tapenp)
-    # tapeBlurred = cv2.blur(tapeFrame, (10, 10))
+    tapeBlurred = cv2.blur(tapeFrame, (10, 10))
     tapeHsv = cv2.cvtColor(tapeFrame, cv2.COLOR_BGR2HSV)
     tapeMask = cv2.inRange(tapeHsv, hsvTapeLower, hsvTapeUpper)
     tapeMask = cv2.erode(tapeMask, None, iterations=2)
