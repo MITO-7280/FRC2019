@@ -39,7 +39,7 @@ hsvBallUpper = (15, 255, 255)
 # hsvTapeLower = (0, 0, 245)
 # hsvTapeUpper = (255, 20, 255)
 
-hsvTapeLower = (80, 75, 170)
+hsvTapeLower = (86, 85, 190)
 hsvTapeUpper = (100, 255, 255)
 
 hsvGroundLower = (0, 0, 192)
@@ -138,7 +138,7 @@ while True:
                     ballPos = 3
     else:
         ballPos = 0
-    print("ballPos=", ballPos)
+    # print("ballPos=", ballPos)
     ballNetwork.putNumber("Y", ballPos)
 
     # update the points queuec
